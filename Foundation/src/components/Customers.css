@@ -1,0 +1,458 @@
+/* =========================================
+   CUSTOMER DETAILS MODAL
+========================================= */
+
+.customer-details-overlay {
+  z-index: 1100;
+}
+
+.customer-details-modal {
+  max-width: 570px;
+
+  overflow: hidden;
+
+  background: #ffffff;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.details-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding: 21px 22px 18px;
+
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.details-title {
+  display: flex;
+  align-items: center;
+
+  gap: 11px;
+}
+
+.details-title-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #eef2ff;
+  color: #4f46e5;
+
+  font-size: 18px;
+}
+
+.details-title h2 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.details-title p {
+  margin: 4px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+.details-close-btn {
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #f8fafc;
+  color: #64748b;
+
+  font-size: 17px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.details-close-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+/* =========================================
+   PROFILE
+========================================= */
+
+.customer-profile-card {
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  margin: 20px 22px 18px;
+
+  padding: 16px;
+
+  border: 1px solid #e8edf5;
+
+  border-radius: 13px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f8faff 0%,
+      #ffffff 100%
+    );
+}
+
+/* Avatar */
+
+.customer-profile-card .large-avatar {
+  width: 52px;
+  height: 52px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #4f46e5,
+      #6366f1
+    );
+
+  color: #ffffff;
+
+  font-size: 19px;
+  font-weight: 700;
+
+  box-shadow:
+    0 6px 15px rgba(79, 70, 229, 0.2);
+}
+
+/* Profile info */
+
+.customer-profile-info {
+  flex: 1;
+
+  min-width: 0;
+}
+
+.customer-profile-info h3 {
+  margin: 0 0 6px;
+
+  overflow: hidden;
+
+  color: #1e293b;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-meta {
+  display: flex;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 8px 13px;
+}
+
+.profile-meta span {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 4px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+}
+
+.profile-meta svg {
+  font-size: 11px;
+}
+
+/* =========================================
+   STATUS
+========================================= */
+
+.details-status {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+
+  padding: 6px 10px;
+
+  border-radius: 20px;
+
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.details-status-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+}
+
+.details-status.active {
+  background: #ecfdf3;
+  color: #15803d;
+}
+
+.details-status.active
+.details-status-dot {
+  background: #22c55e;
+}
+
+.details-status.inactive {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.details-status.inactive
+.details-status-dot {
+  background: #ef4444;
+}
+
+.details-status.pending {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.details-status.pending
+.details-status-dot {
+  background: #f59e0b;
+}
+
+/* =========================================
+   DETAILS SECTION
+========================================= */
+
+.customer-details-section {
+  padding: 0 22px 20px;
+}
+
+.details-section-title {
+  margin-bottom: 11px;
+
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.customer-details-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 10px;
+}
+
+/* =========================================
+   DETAIL CARD
+========================================= */
+
+.customer-detail-card {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  min-width: 0;
+
+  padding: 13px;
+
+  border: 1px solid #edf1f5;
+
+  border-radius: 11px;
+
+  background: #ffffff;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.customer-detail-card:hover {
+  border-color: #dbe2ef;
+
+  background: #fafbff;
+}
+
+/* Icon */
+
+.detail-icon {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 9px;
+
+  font-size: 15px;
+}
+
+.detail-icon.email {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.detail-icon.phone {
+  background: #ecfeff;
+  color: #0891b2;
+}
+
+.detail-icon.service {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+
+.detail-icon.date {
+  background: #fff7ed;
+  color: #ea580c;
+}
+
+/* Content */
+
+.detail-content {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.detail-label {
+  color: #94a3b8;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+}
+
+.detail-content p {
+  margin: 0;
+
+  overflow: hidden;
+
+  color: #334155;
+
+  font-size: 11px;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.details-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  padding: 14px 22px;
+
+  border-top: 1px solid #f1f5f9;
+
+  background: #fafbfc;
+}
+
+.details-modal-footer .secondary-btn {
+  min-width: 90px;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+  .customer-details-modal {
+    max-width: 100%;
+  }
+
+  .customer-profile-card {
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+  }
+
+  .details-status {
+    margin-left: 65px;
+    margin-top: -4px;
+  }
+
+  .customer-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .details-modal-header {
+    padding: 17px;
+  }
+
+  .customer-profile-card {
+    margin: 16px;
+  }
+
+  .customer-details-section {
+    padding: 0 16px 17px;
+  }
+
+  .details-modal-footer {
+    padding: 13px 16px;
+  }
+
+  .details-title h2 {
+    font-size: 15px;
+  }
+
+  .details-title p {
+    font-size: 10px;
+  }
+}

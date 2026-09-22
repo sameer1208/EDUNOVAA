@@ -1,0 +1,222 @@
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+
+  padding: 22px 14px;
+
+  position: sticky;
+  top: 0;
+
+  box-sizing: border-box;
+}
+
+/* ================= LOGO ================= */
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  padding: 4px 10px 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+
+  color: white;
+
+  font-size: 19px;
+  font-weight: 800;
+
+  box-shadow: 0 5px 14px rgba(79, 70, 229, 0.25);
+}
+
+.logo-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.logo-title {
+  color: #111827;
+
+  font-size: 16px;
+  font-weight: 750;
+
+  line-height: 1.2;
+}
+
+.logo-subtitle {
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  letter-spacing: 0.2px;
+}
+
+/* ================= SECTION ================= */
+
+.sidebar-section-title {
+  padding: 25px 11px 9px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+}
+
+/* ================= MENU ================= */
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sidebar-item {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  border: none;
+  outline: none;
+
+  padding: 11px 12px;
+
+  border-radius: 10px;
+
+  background: transparent;
+
+  color: #64748b;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.sidebar-item.active {
+  background: #eef2ff;
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.sidebar-item.active:hover {
+  background: #e9edff;
+}
+
+/* ================= ICON ================= */
+
+.sidebar-icon {
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  font-size: 18px;
+}
+
+.sidebar-item-name {
+  flex: 1;
+}
+
+/* ================= ACTIVE ARROW ================= */
+
+.sidebar-arrow {
+  width: 20px;
+  height: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+
+  opacity: 0.8;
+}
+
+/* ================= BOTTOM ================= */
+
+.sidebar-bottom {
+  margin-top: auto;
+
+  padding-top: 10px;
+}
+
+.logout-item:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 72px;
+    min-width: 72px;
+
+    padding: 18px 9px;
+  }
+
+  .sidebar-logo {
+    justify-content: center;
+    padding: 0 0 20px;
+  }
+
+  .logo-content,
+  .sidebar-section-title,
+  .sidebar-item-name,
+  .sidebar-arrow {
+    display: none;
+  }
+
+  .sidebar-item {
+    justify-content: center;
+
+    padding: 12px;
+  }
+
+  .sidebar-icon {
+    font-size: 20px;
+  }
+}

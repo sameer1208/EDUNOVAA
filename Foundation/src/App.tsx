@@ -1,4 +1,12 @@
 import { useState } from "react";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -7,45 +15,100 @@ import Customers from "./pages/Customers";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 
-const App = () => {
-  const [isLoggedIn, setIsLoggedIn] =
-    useState<boolean>(false);
+import "./App.css";
 
-  const [activePage, setActivePage] =
-    useState<string>("Dashboard");
+const ProtectedLayout = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    return localStorage.getItem("isLoggedIn") === "true";
+  });
 
   if (!isLoggedIn) {
-    return (
-      <Login
-        onLogin={() => setIsLoggedIn(true)}
-      />
-    );
+    return <Navigate to="/login" replace />;
   }
 
-  const renderPage = () => {
-    switch (activePage) {
-      case "Customers":
-        return <Customers />;
+  const getActivePage = () => {
+    if (location.pathname === "/customers") {
+      return "Customers";
+    }
 
+    return "Dashboard";
+  };
+
+  const activePage = getActivePage();
+
+  const handlePageChange = (page: string) => {
+    switch (page) {
       case "Dashboard":
+        navigate("/dashboard");
+        break;
+
+      case "Customers":
+        navigate("/customers");
+        break;
+
+      case "Settings":
+        // Settings page abhi available nahi hai
+        break;
+
+      case "Logout":
+        localStorage.removeItem("isLoggedIn");
+        setIsLoggedIn(false);
+        navigate("/login", {
+          replace: true,
+        });
+        break;
+
       default:
-        return <Dashboard />;
+        navigate("/dashboard");
     }
   };
 
   return (
     <div className="app">
-      <Sidebar
-        activePage={activePage}
-        setActivePage={setActivePage}
-      />
+      <Sidebar activePage={activePage} setActivePage={handlePageChange} />
 
       <main className="main-content">
         <Header title={activePage} />
 
-        {renderPage()}
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          <Route path="/customers" element={<Customers />} />
+
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
       </main>
     </div>
+  );
+};
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* ================= LOGIN ================= */}
+
+        <Route
+          path="/login"
+          element={
+            <Login
+              onLogin={() => {
+                localStorage.setItem("isLoggedIn", "true");
+
+                window.location.href = "/dashboard";
+              }}
+            />
+          }
+        />
+
+        {/* ================ PROTECTED APP ================ */}
+
+        <Route path="/*" element={<ProtectedLayout />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 

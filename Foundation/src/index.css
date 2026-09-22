@@ -5,10 +5,7 @@
 }
 
 body {
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   background: #f5f7fb;
   color: #1f2937;
 }
@@ -28,7 +25,9 @@ button {
   display: flex;
 }
 
-/* SIDEBAR */
+/* ==========================================
+   SIDEBAR
+========================================== */
 
 .sidebar {
   width: 250px;
@@ -107,7 +106,9 @@ button {
   gap: 6px;
 }
 
-/* MAIN */
+/* ==========================================
+   MAIN
+========================================== */
 
 .main-content {
   margin-left: 250px;
@@ -115,7 +116,9 @@ button {
   min-height: 100vh;
 }
 
-/* HEADER */
+/* ==========================================
+   HEADER
+========================================== */
 
 .header {
   min-height: 90px;
@@ -189,13 +192,17 @@ button {
   font-size: 11px;
 }
 
-/* PAGE */
+/* ==========================================
+   PAGE
+========================================== */
 
 .page-content {
   padding: 30px;
 }
 
-/* SUMMARY */
+/* ==========================================
+   SUMMARY
+========================================== */
 
 .summary-grid {
   display: grid;
@@ -243,7 +250,9 @@ button {
   margin-top: 18px;
 }
 
-/* SECTION */
+/* ==========================================
+   SECTION
+========================================== */
 
 .section-card {
   background: white;
@@ -280,7 +289,9 @@ button {
   font-weight: 600;
 }
 
-/* TABLE */
+/* ==========================================
+   TABLE
+========================================== */
 
 .table-wrapper {
   overflow-x: auto;
@@ -319,7 +330,9 @@ td {
   font-size: 12px;
 }
 
-/* STATUS */
+/* ==========================================
+   STATUS
+========================================== */
 
 .status {
   display: inline-block;
@@ -350,7 +363,9 @@ td {
   color: #1d4ed8;
 }
 
-/* FILTER */
+/* ==========================================
+   FILTER
+========================================== */
 
 .filters {
   padding: 0 22px 20px;
@@ -358,42 +373,13 @@ td {
   gap: 12px;
 }
 
-.search-box {
-  flex: 1;
-  max-width: 400px;
-  position: relative;
-}
-
-.search-box span {
-  position: absolute;
-  left: 13px;
-  top: 10px;
-  color: #9ca3af;
-}
-
-.search-box input,
-.filters select {
-  width: 100%;
-  height: 40px;
-  border: 1px solid #d1d5db;
-  border-radius: 7px;
-  outline: none;
-  padding: 0 12px;
-  background: white;
-}
-
-.search-box input {
-  padding-left: 35px;
-}
-
-.search-box input:focus,
-.filters select:focus {
-  border-color: #4f46e5;
-}
-
 .filters select {
   width: 160px;
 }
+
+/* ==========================================
+   BUTTONS
+========================================== */
 
 .primary-btn,
 .secondary-btn {
@@ -423,7 +409,9 @@ td {
   color: #6b7280;
 }
 
-/* MODAL */
+/* ==========================================
+   MODAL
+========================================== */
 
 .modal-overlay {
   position: fixed;
@@ -515,40 +503,9 @@ td {
   padding-top: 15px;
 }
 
-/* FORM */
-
-.form-group {
-  margin-bottom: 18px;
-}
-
-.form-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 7px;
-}
-
-.form-group input {
-  width: 100%;
-  height: 42px;
-  border: 1px solid #d1d5db;
-  border-radius: 7px;
-  padding: 0 12px;
-  outline: none;
-}
-
-.form-group input:focus {
-  border-color: #4f46e5;
-}
-
-.error-message {
-  display: block;
-  color: #dc2626;
-  font-size: 11px;
-  margin-top: 5px;
-}
-
-/* LOGIN */
+/* ==========================================
+   LOGIN
+========================================== */
 
 .login-page {
   min-height: 100vh;
@@ -608,7 +565,9 @@ td {
   background: #4338ca;
 }
 
-/* RESPONSIVE */
+/* ==========================================
+   RESPONSIVE
+========================================== */
 
 @media (max-width: 1100px) {
   .summary-grid {

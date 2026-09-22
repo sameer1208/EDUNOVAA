@@ -1,14 +1,32 @@
 import {
+  useEffect,
   useMemo,
+  useRef,
   useState,
+  type ChangeEvent,
+  type FormEvent,
 } from "react";
+
+import {
+  FiPlus,
+  FiSearch,
+  FiFilter,
+  FiEye,
+  FiX,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiBriefcase,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiUsers,
+} from "react-icons/fi";
 
 import CustomerModal from "../components/CustomerMoal";
 
-import {
-  customers as initialCustomers,
-  type Customer,
-} from "../data/mockdata";
+import { customers as initialCustomers, type Customer } from "../data/mockdata";
+
+import "./Customers.css";
 
 interface NewCustomer {
   name: string;
@@ -17,84 +35,216 @@ interface NewCustomer {
   service: string;
 }
 
+type FormErrors = Partial<Record<keyof NewCustomer, string>>;
+
 const Customers = () => {
-  const [customers, setCustomers] =
-    useState<Customer[]>(initialCustomers);
+  const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
 
-  const [search, setSearch] =
-    useState<string>("");
+  const [search, setSearch] = useState<string>("");
 
-  const [statusFilter, setStatusFilter] =
-    useState<string>("All");
+  const [statusFilter, setStatusFilter] = useState<string>("All");
 
-  const [selectedCustomer, setSelectedCustomer] =
-    useState<Customer | null>(null);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null,
+  );
 
-  const [showAddModal, setShowAddModal] =
-    useState<boolean>(false);
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
 
-  const [newCustomer, setNewCustomer] =
-    useState<NewCustomer>({
-      name: "",
-      email: "",
-      phone: "",
-      service: "",
-    });
+  const [newCustomer, setNewCustomer] = useState<NewCustomer>({
+    name: "",
+    email: "",
+    phone: "",
+    service: "",
+  });
+
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const serviceRef = useRef<HTMLInputElement>(null);
 
   const filteredCustomers = useMemo(() => {
     return customers.filter((customer) => {
-      const searchValue =
-        search.toLowerCase().trim();
+      const searchValue = search.toLowerCase().trim();
 
       const matchesSearch =
-        customer.name
-          .toLowerCase()
-          .includes(searchValue) ||
-        customer.email
-          .toLowerCase()
-          .includes(searchValue);
+        customer.name.toLowerCase().includes(searchValue) ||
+        customer.email.toLowerCase().includes(searchValue) ||
+        customer.phone.toLowerCase().includes(searchValue) ||
+        customer.service.toLowerCase().includes(searchValue);
 
       const matchesStatus =
-        statusFilter === "All" ||
-        customer.status === statusFilter;
+        statusFilter === "All" || customer.status === statusFilter;
 
-      return (
-        matchesSearch && matchesStatus
-      );
+      return matchesSearch && matchesStatus;
     });
   }, [customers, search, statusFilter]);
 
-  const handleAddCustomer = (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
+  const validateField = (field: keyof NewCustomer, value: string): string => {
+    const trimmedValue = value.trim();
+
+    switch (field) {
+      case "name":
+        if (!trimmedValue) {
+          return "Customer name is required";
+        }
+
+        if (trimmedValue.length < 2) {
+          return "Name must contain at least 2 characters";
+        }
+
+        if (!/^[a-zA-Z\s.'-]+$/.test(trimmedValue)) {
+          return "Please enter a valid name";
+        }
+
+        return "";
+
+      case "email":
+        if (!trimmedValue) {
+          return "Email address is required";
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmedValue)) {
+          return "Please enter a valid email address";
+        }
+
+        return "";
+
+      case "phone":
+        if (!trimmedValue) {
+          return "Phone number is required";
+        }
+
+        if (!/^\d+$/.test(trimmedValue)) {
+          return "Phone number must contain digits only";
+        }
+
+        if (trimmedValue.length !== 10) {
+          return "Phone number must be exactly 10 digits";
+        }
+
+        return "";
+
+      case "service":
+        if (!trimmedValue) {
+          return "Service is required";
+        }
+
+        if (trimmedValue.length < 2) {
+          return "Service name is too short";
+        }
+
+        return "";
+
+      default:
+        return "";
+    }
+  };
+
+  const validateForm = (): FormErrors => {
+    const formErrors: FormErrors = {};
+
+    (Object.keys(newCustomer) as Array<keyof NewCustomer>).forEach((field) => {
+      const error = validateField(field, newCustomer[field]);
+
+      if (error) {
+        formErrors[field] = error;
+      }
+    });
+
+    return formErrors;
+  };
+
+  const focusFirstError = (formErrors: FormErrors) => {
+    if (formErrors.name) {
+      nameRef.current?.focus();
+      return;
+    }
+
+    if (formErrors.email) {
+      emailRef.current?.focus();
+      return;
+    }
+
+    if (formErrors.phone) {
+      phoneRef.current?.focus();
+      return;
+    }
+
+    if (formErrors.service) {
+      serviceRef.current?.focus();
+    }
+  };
+
+  const handleAddCustomer = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (
-      !newCustomer.name.trim() ||
-      !newCustomer.email.trim() ||
-      !newCustomer.phone.trim() ||
-      !newCustomer.service.trim()
-    ) {
+    setSubmitted(true);
+
+    const formErrors = validateForm();
+
+    setErrors(formErrors);
+
+    if (Object.keys(formErrors).length > 0) {
+      setTimeout(() => {
+        focusFirstError(formErrors);
+      }, 0);
+
       return;
     }
 
     const customer: Customer = {
       id: Date.now(),
-      name: newCustomer.name,
-      email: newCustomer.email,
-      phone: newCustomer.phone,
-      service: newCustomer.service,
+      name: newCustomer.name.trim(),
+      email: newCustomer.email.trim(),
+      phone: newCustomer.phone.trim(),
+      service: newCustomer.service.trim(),
       status: "Active",
-      joinedDate: new Date()
-        .toISOString()
-        .split("T")[0],
+      joinedDate: new Date().toISOString().split("T")[0],
     };
 
-    setCustomers((previous) => [
-      customer,
-      ...previous,
-    ]);
+    setCustomers((previous) => [customer, ...previous]);
 
+    resetCustomerForm();
+
+    setShowAddModal(false);
+  };
+
+  const handleNewCustomerChange = (field: keyof NewCustomer, value: string) => {
+    let updatedValue = value;
+
+    if (field === "phone") {
+      updatedValue = value.replace(/\D/g, "").slice(0, 10);
+    }
+
+    setNewCustomer((previous) => ({
+      ...previous,
+      [field]: updatedValue,
+    }));
+
+    if (submitted || errors[field]) {
+      const error = validateField(field, updatedValue);
+
+      setErrors((previous) => {
+        const updatedErrors = {
+          ...previous,
+        };
+
+        if (error) {
+          updatedErrors[field] = error;
+        } else {
+          delete updatedErrors[field];
+        }
+
+        return updatedErrors;
+      });
+    }
+  };
+
+  const resetCustomerForm = () => {
     setNewCustomer({
       name: "",
       email: "",
@@ -102,93 +252,153 @@ const Customers = () => {
       service: "",
     });
 
+    setErrors({});
+    setSubmitted(false);
+  };
+
+  const openAddModal = () => {
+    resetCustomerForm();
+    setShowAddModal(true);
+  };
+
+  const closeAddModal = () => {
+    resetCustomerForm();
     setShowAddModal(false);
   };
 
-  const handleNewCustomerChange = (
-    field: keyof NewCustomer,
-    value: string
-  ) => {
-    setNewCustomer((previous) => ({
-      ...previous,
-      [field]: value,
-    }));
-  };
+  useEffect(() => {
+    if (showAddModal) {
+      const timer = setTimeout(() => {
+        nameRef.current?.focus();
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showAddModal]);
+
+  useEffect(() => {
+    if (!showAddModal) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeAddModal();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [showAddModal]);
 
   return (
-    <div className="page-content">
-      <div className="section-card">
-        <div className="customer-toolbar">
-          <div>
-            <h2>Customers</h2>
+    <div className="page-content customers-page">
+      {/* ======================================
+          MAIN CARD
+      ======================================= */}
 
-            <p>
-              Manage all your customers
-            </p>
+      <div className="section-card">
+        {/* HEADER */}
+        <div className="customer-toolbar">
+          <div className="page-heading">
+            <div className="page-heading-icon">
+              <FiUsers />
+            </div>
+
+            <div>
+              <h2>Customers</h2>
+
+              <p>Manage and view all your customers</p>
+            </div>
           </div>
 
           <button
-            className="primary-btn"
-            onClick={() =>
-              setShowAddModal(true)
-            }
+            type="button"
+            className="primary-btn add-customer-btn"
+            onClick={openAddModal}
           >
-            + Add Customer
+            <FiPlus />
+            <span>Add Customer</span>
           </button>
         </div>
 
+        {/* ====================================
+            FILTERS
+        ===================================== */}
+
         <div className="filters">
+          {/* SEARCH */}
           <div className="search-box">
-            <span>⌕</span>
+            <FiSearch />
 
             <input
               type="text"
-              placeholder="Search customers..."
+              placeholder="Search by name, email, phone or service..."
               value={search}
-              onChange={(
-                event: React.ChangeEvent<HTMLInputElement>
-              ) =>
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 setSearch(event.target.value)
               }
             />
+
+            {search && (
+              <button
+                type="button"
+                className="clear-search"
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+              >
+                <FiX />
+              </button>
+            )}
           </div>
 
-          <select
-            value={statusFilter}
-            onChange={(
-              event: React.ChangeEvent<HTMLSelectElement>
-            ) =>
-              setStatusFilter(
-                event.target.value
-              )
-            }
-          >
-            <option value="All">
-              All Status
-            </option>
+          {/* STATUS FILTER */}
+          <div className="filter-select-wrapper">
+            <FiFilter />
 
-            <option value="Active">
-              Active
-            </option>
+            <select
+              value={statusFilter}
+              onChange={(event: ChangeEvent<HTMLSelectElement>) =>
+                setStatusFilter(event.target.value)
+              }
+            >
+              <option value="All">All Status</option>
 
-            <option value="Inactive">
-              Inactive
-            </option>
+              <option value="Active">Active</option>
 
-            <option value="Pending">
-              Pending
-            </option>
-          </select>
+              <option value="Inactive">Inactive</option>
+
+              <option value="Pending">Pending</option>
+            </select>
+          </div>
         </div>
 
+        {/* ====================================
+            RESULTS
+        ===================================== */}
+
+        <div className="customer-results">
+          <span>
+            Showing <strong>{filteredCustomers.length}</strong> of{" "}
+            <strong>{customers.length}</strong> customers
+          </span>
+        </div>
+
+        {/* ====================================
+            TABLE
+        ===================================== */}
         <div className="table-wrapper">
-          <table>
+          <table className="customers-table">
             <thead>
               <tr>
-                <th>Customer</th>
+                <th>Name</th>
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Service</th>
+                <th>Joined Date</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -196,65 +406,119 @@ const Customers = () => {
 
             <tbody>
               {filteredCustomers.length > 0 ? (
-                filteredCustomers.map(
-                  (customer) => (
-                    <tr key={customer.id}>
-                      <td>
-                        <div className="table-customer">
-                          <div className="small-avatar">
-                            {customer.name.charAt(
-                              0
-                            )}
-                          </div>
-
-                          <span>
-                            {customer.name}
-                          </span>
+                filteredCustomers.map((customer) => (
+                  <tr key={customer.id}>
+                    {/* NAME */}
+                    <td>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          minWidth: "160px",
+                        }}
+                      >
+                        <div className="small-avatar">
+                          {customer.name.charAt(0).toUpperCase()}
                         </div>
-                      </td>
 
-                      <td>
-                        {customer.email}
-                      </td>
-
-                      <td>
-                        {customer.phone}
-                      </td>
-
-                      <td>
-                        {customer.service}
-                      </td>
-
-                      <td>
                         <span
-                          className={`status ${customer.status.toLowerCase()}`}
+                          style={{
+                            fontWeight: 600,
+                            color: "#111827",
+                            whiteSpace: "nowrap",
+                          }}
                         >
-                          {customer.status}
+                          {customer.name}
                         </span>
-                      </td>
+                      </div>
+                    </td>
 
-                      <td>
-                        <button
-                          className="details-btn"
-                          onClick={() =>
-                            setSelectedCustomer(
-                              customer
-                            )
-                          }
-                        >
-                          View
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                )
+                    {/* EMAIL */}
+                    <td>
+                      <div className="table-contact">
+                        <FiMail />
+                        <span>{customer.email}</span>
+                      </div>
+                    </td>
+
+                    {/* PHONE */}
+                    <td>
+                      <div className="table-contact">
+                        <FiPhone />
+                        <span>{customer.phone}</span>
+                      </div>
+                    </td>
+
+                    {/* SERVICE */}
+                    <td>
+                      <div className="table-contact">
+                        <FiBriefcase />
+                        <span>{customer.service}</span>
+                      </div>
+                    </td>
+
+                    {/* JOINED DATE */}
+                    <td>
+                      <span
+                        style={{
+                          color: "#64748b",
+                          fontSize: "13px",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {customer.joinedDate}
+                      </span>
+                    </td>
+
+                    {/* STATUS */}
+                    <td>
+                      <span
+                        className={`status ${customer.status.toLowerCase()}`}
+                      >
+                        <span className="status-dot" />
+                        {customer.status}
+                      </span>
+                    </td>
+
+                    {/* ACTION */}
+                    <td>
+                      <button
+                        type="button"
+                        className="details-btn"
+                        onClick={() => setSelectedCustomer(customer)}
+                      >
+                        <FiEye />
+                        <span>View</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="empty-state"
-                  >
-                    No customers found
+                  <td colSpan={7} className="empty-state">
+                    <div className="empty-state-content">
+                      <div className="empty-state-icon">
+                        <FiUsers />
+                      </div>
+
+                      <h3>No customers found</h3>
+
+                      <p>Try changing your search or filter.</p>
+
+                      {(search || statusFilter !== "All") && (
+                        <button
+                          type="button"
+                          className="clear-filter-btn"
+                          onClick={() => {
+                            setSearch("");
+                            setStatusFilter("All");
+                          }}
+                        >
+                          Clear filters
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               )}
@@ -263,127 +527,284 @@ const Customers = () => {
         </div>
       </div>
 
+      {/* ======================================
+          CUSTOMER DETAILS MODAL
+      ======================================= */}
+
       <CustomerModal
         customer={selectedCustomer}
-        onClose={() =>
-          setSelectedCustomer(null)
-        }
+        onClose={() => setSelectedCustomer(null)}
       />
 
-      {showAddModal && (
-        <div
-          className="modal-overlay"
-          onClick={() =>
-            setShowAddModal(false)
-          }
-        >
-          <div
-            className="customer-modal"
-            onClick={(event) =>
-              event.stopPropagation()
-            }
-          >
-            <div className="modal-header">
-              <div>
-                <h2>Add Customer</h2>
+      {/* ======================================
+          ADD CUSTOMER MODAL
+      ======================================= */}
 
-                <p>
-                  Create a new customer
-                </p>
+      {showAddModal && (
+        <div className="modal-overlay" onClick={closeAddModal}>
+          <div
+            className="customer-modal add-customer-modal"
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: "700px",
+            }}
+          >
+            {/* MODAL HEADER */}
+            <div className="modal-header">
+              <div className="modal-title-wrapper">
+                <div className="modal-icon">
+                  <FiUser />
+                </div>
+
+                <div>
+                  <h2>Add Customer</h2>
+                  <p>Add a new customer to your database</p>
+                </div>
               </div>
 
               <button
+                type="button"
                 className="close-btn"
-                onClick={() =>
-                  setShowAddModal(false)
-                }
+                onClick={closeAddModal}
+                aria-label="Close modal"
               >
-                ×
+                <FiX />
               </button>
             </div>
 
-            <form
-              onSubmit={handleAddCustomer}
-            >
-              <div className="form-group">
-                <label>Name</label>
+            {/* FORM */}
+            <form onSubmit={handleAddCustomer} noValidate>
+              <div
+                className="modal-form"
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 0,
+                  padding: "8px 0",
+                }}
+              >
+                {/* NAME */}
+                <div
+                  className={`form-group ${errors.name ? "has-error" : ""}`}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "180px 1fr",
+                    alignItems: "start",
+                    columnGap: "20px",
+                    padding: "16px 20px",
+                    borderBottom: "1px solid #f1f5f9",
+                  }}
+                >
+                  <label
+                    htmlFor="customer-name"
+                    style={{
+                      margin: 0,
+                      paddingTop: "12px",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "#64748b",
+                    }}
+                  >
+                    Customer Name <span>*</span>
+                  </label>
 
-                <input
-                  type="text"
-                  placeholder="Customer name"
-                  value={newCustomer.name}
-                  onChange={(event) =>
-                    handleNewCustomerChange(
-                      "name",
-                      event.target.value
-                    )
-                  }
-                />
+                  <div>
+                    <div className="input-wrapper">
+                      <FiUser />
+
+                      <input
+                        ref={nameRef}
+                        id="customer-name"
+                        type="text"
+                        placeholder="Enter customer name"
+                        value={newCustomer.name}
+                        onChange={(event) =>
+                          handleNewCustomerChange("name", event.target.value)
+                        }
+                        aria-invalid={!!errors.name}
+                      />
+                    </div>
+
+                    {errors.name && (
+                      <div className="field-error">
+                        <FiAlertCircle />
+                        {errors.name}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* EMAIL */}
+                <div
+                  className={`form-group ${errors.email ? "has-error" : ""}`}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "180px 1fr",
+                    alignItems: "start",
+                    columnGap: "20px",
+                    padding: "16px 20px",
+                    borderBottom: "1px solid #f1f5f9",
+                  }}
+                >
+                  <label
+                    htmlFor="customer-email"
+                    style={{
+                      margin: 0,
+                      paddingTop: "12px",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "#64748b",
+                    }}
+                  >
+                    Email Address <span>*</span>
+                  </label>
+
+                  <div>
+                    <div className="input-wrapper">
+                      <FiMail />
+
+                      <input
+                        ref={emailRef}
+                        id="customer-email"
+                        type="email"
+                        placeholder="Enter email address"
+                        value={newCustomer.email}
+                        onChange={(event) =>
+                          handleNewCustomerChange("email", event.target.value)
+                        }
+                        aria-invalid={!!errors.email}
+                      />
+                    </div>
+
+                    {errors.email && (
+                      <div className="field-error">
+                        <FiAlertCircle />
+                        {errors.email}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* PHONE */}
+                <div
+                  className={`form-group ${errors.phone ? "has-error" : ""}`}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "180px 1fr",
+                    alignItems: "start",
+                    columnGap: "20px",
+                    padding: "16px 20px",
+                    borderBottom: "1px solid #f1f5f9",
+                  }}
+                >
+                  <label
+                    htmlFor="customer-phone"
+                    style={{
+                      margin: 0,
+                      paddingTop: "12px",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "#64748b",
+                    }}
+                  >
+                    Phone Number <span>*</span>
+                  </label>
+
+                  <div>
+                    <div className="input-wrapper">
+                      <FiPhone />
+
+                      <input
+                        ref={phoneRef}
+                        id="customer-phone"
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder="Enter 10-digit phone number"
+                        value={newCustomer.phone}
+                        onChange={(event) =>
+                          handleNewCustomerChange("phone", event.target.value)
+                        }
+                        maxLength={10}
+                        aria-invalid={!!errors.phone}
+                      />
+                    </div>
+
+                    <div className="input-hint">Enter exactly 10 digits</div>
+
+                    {errors.phone && (
+                      <div className="field-error">
+                        <FiAlertCircle />
+                        {errors.phone}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* SERVICE */}
+                <div
+                  className={`form-group ${errors.service ? "has-error" : ""}`}
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "180px 1fr",
+                    alignItems: "start",
+                    columnGap: "20px",
+                    padding: "16px 20px",
+                  }}
+                >
+                  <label
+                    htmlFor="customer-service"
+                    style={{
+                      margin: 0,
+                      paddingTop: "12px",
+                      fontSize: "13px",
+                      fontWeight: 600,
+                      color: "#64748b",
+                    }}
+                  >
+                    Service <span>*</span>
+                  </label>
+
+                  <div>
+                    <div className="input-wrapper">
+                      <FiBriefcase />
+
+                      <input
+                        ref={serviceRef}
+                        id="customer-service"
+                        type="text"
+                        placeholder="Enter service"
+                        value={newCustomer.service}
+                        onChange={(event) =>
+                          handleNewCustomerChange("service", event.target.value)
+                        }
+                        aria-invalid={!!errors.service}
+                      />
+                    </div>
+
+                    {errors.service && (
+                      <div className="field-error">
+                        <FiAlertCircle />
+                        {errors.service}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
-              <div className="form-group">
-                <label>Email</label>
-
-                <input
-                  type="email"
-                  placeholder="Customer email"
-                  value={newCustomer.email}
-                  onChange={(event) =>
-                    handleNewCustomerChange(
-                      "email",
-                      event.target.value
-                    )
-                  }
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Phone</label>
-
-                <input
-                  type="text"
-                  placeholder="Phone number"
-                  value={newCustomer.phone}
-                  onChange={(event) =>
-                    handleNewCustomerChange(
-                      "phone",
-                      event.target.value
-                    )
-                  }
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Service</label>
-
-                <input
-                  type="text"
-                  placeholder="Service"
-                  value={newCustomer.service}
-                  onChange={(event) =>
-                    handleNewCustomerChange(
-                      "service",
-                      event.target.value
-                    )
-                  }
-                />
-              </div>
-
+              {/* FOOTER */}
               <div className="modal-footer">
                 <button
                   type="button"
                   className="secondary-btn"
-                  onClick={() =>
-                    setShowAddModal(false)
-                  }
+                  onClick={closeAddModal}
                 >
+                  <FiX />
                   Cancel
                 </button>
 
-                <button
-                  type="submit"
-                  className="primary-btn"
-                >
+                <button type="submit" className="primary-btn">
+                  <FiCheckCircle />
                   Add Customer
                 </button>
               </div>
