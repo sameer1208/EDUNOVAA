@@ -22,9 +22,12 @@ import {
   FiUsers,
 } from "react-icons/fi";
 
-import CustomerModal from "../components/CustomerMoal";
+import CustomerModal from "../../components/customer/CustomerModal";
 
-import { customers as initialCustomers, type Customer } from "../data/mockdata";
+import {
+  customers as initialCustomers,
+  type Customer,
+} from "../../data/mockdata";
 
 import "./Customers.css";
 
@@ -43,6 +46,17 @@ const Customers = () => {
   const [search, setSearch] = useState<string>("");
 
   const [statusFilter, setStatusFilter] = useState<string>("All");
+
+  type CustomerSortField =
+    | "name"
+    | "email"
+    | "phone"
+    | "service"
+    | "joinedDate"
+    | "status";
+
+  const [sortField, setSortField] = useState<CustomerSortField>("joinedDate");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
@@ -67,10 +81,11 @@ const Customers = () => {
   const serviceRef = useRef<HTMLInputElement>(null);
 
   const filteredCustomers = useMemo(() => {
-    return customers.filter((customer) => {
-      const searchValue = search.toLowerCase().trim();
+    const searchValue = search.toLowerCase().trim();
 
+    const result = customers.filter((customer) => {
       const matchesSearch =
+        !searchValue ||
         customer.name.toLowerCase().includes(searchValue) ||
         customer.email.toLowerCase().includes(searchValue) ||
         customer.phone.toLowerCase().includes(searchValue) ||
@@ -81,7 +96,38 @@ const Customers = () => {
 
       return matchesSearch && matchesStatus;
     });
-  }, [customers, search, statusFilter]);
+
+    return [...result].sort((a, b) => {
+      const comparison = String(a[sortField]).localeCompare(
+        String(b[sortField]),
+        undefined,
+        {
+          numeric: true,
+          sensitivity: "base",
+        },
+      );
+
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [customers, search, statusFilter, sortField, sortDirection]);
+
+  const handleSort = (field: CustomerSortField) => {
+    if (sortField === field) {
+      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+      return;
+    }
+
+    setSortField(field);
+    setSortDirection(field === "joinedDate" ? "desc" : "asc");
+  };
+
+  const sortIcon = (field: CustomerSortField) => {
+    if (sortField !== field) {
+      return null;
+    }
+
+    return sortDirection === "asc" ? " ↑" : " ↓";
+  };
 
   const validateField = (field: keyof NewCustomer, value: string): string => {
     const trimmedValue = value.trim();
@@ -394,12 +440,36 @@ const Customers = () => {
           <table className="customers-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Service</th>
-                <th>Joined Date</th>
-                <th>Status</th>
+                {[
+                  ["name", "Name"],
+                  ["email", "Email"],
+                  ["phone", "Phone"],
+                  ["service", "Service"],
+                  ["joinedDate", "Joined Date"],
+                  ["status", "Status"],
+                ].map(([field, label]) => (
+                  <th key={field}>
+                    <button
+                      type="button"
+                      onClick={() => handleSort(field as CustomerSortField)}
+                      style={{
+                        border: 0,
+                        background: "transparent",
+                        padding: 0,
+                        font: "inherit",
+                        color: "inherit",
+                        fontWeight: 600,
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {label}
+                      {sortIcon(field as CustomerSortField)}
+                    </button>
+                  </th>
+                ))}
                 <th>Action</th>
               </tr>
             </thead>
@@ -545,10 +615,6 @@ const Customers = () => {
           <div
             className="customer-modal add-customer-modal"
             onClick={(event) => event.stopPropagation()}
-            style={{
-              width: "100%",
-              maxWidth: "700px",
-            }}
           >
             {/* MODAL HEADER */}
             <div className="modal-header">
@@ -575,37 +641,10 @@ const Customers = () => {
 
             {/* FORM */}
             <form onSubmit={handleAddCustomer} noValidate>
-              <div
-                className="modal-form"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 0,
-                  padding: "8px 0",
-                }}
-              >
+              <div className="modal-form">
                 {/* NAME */}
-                <div
-                  className={`form-group ${errors.name ? "has-error" : ""}`}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "180px 1fr",
-                    alignItems: "start",
-                    columnGap: "20px",
-                    padding: "16px 20px",
-                    borderBottom: "1px solid #f1f5f9",
-                  }}
-                >
-                  <label
-                    htmlFor="customer-name"
-                    style={{
-                      margin: 0,
-                      paddingTop: "12px",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "#64748b",
-                    }}
-                  >
+                <div className={`form-group ${errors.name ? "has-error" : ""}`}>
+                  <label htmlFor="customer-name">
                     Customer Name <span>*</span>
                   </label>
 
@@ -638,25 +677,8 @@ const Customers = () => {
                 {/* EMAIL */}
                 <div
                   className={`form-group ${errors.email ? "has-error" : ""}`}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "180px 1fr",
-                    alignItems: "start",
-                    columnGap: "20px",
-                    padding: "16px 20px",
-                    borderBottom: "1px solid #f1f5f9",
-                  }}
                 >
-                  <label
-                    htmlFor="customer-email"
-                    style={{
-                      margin: 0,
-                      paddingTop: "12px",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "#64748b",
-                    }}
-                  >
+                  <label htmlFor="customer-email">
                     Email Address <span>*</span>
                   </label>
 
@@ -689,25 +711,8 @@ const Customers = () => {
                 {/* PHONE */}
                 <div
                   className={`form-group ${errors.phone ? "has-error" : ""}`}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "180px 1fr",
-                    alignItems: "start",
-                    columnGap: "20px",
-                    padding: "16px 20px",
-                    borderBottom: "1px solid #f1f5f9",
-                  }}
                 >
-                  <label
-                    htmlFor="customer-phone"
-                    style={{
-                      margin: 0,
-                      paddingTop: "12px",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "#64748b",
-                    }}
-                  >
+                  <label htmlFor="customer-phone">
                     Phone Number <span>*</span>
                   </label>
 
@@ -744,24 +749,8 @@ const Customers = () => {
                 {/* SERVICE */}
                 <div
                   className={`form-group ${errors.service ? "has-error" : ""}`}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "180px 1fr",
-                    alignItems: "start",
-                    columnGap: "20px",
-                    padding: "16px 20px",
-                  }}
                 >
-                  <label
-                    htmlFor="customer-service"
-                    style={{
-                      margin: 0,
-                      paddingTop: "12px",
-                      fontSize: "13px",
-                      fontWeight: 600,
-                      color: "#64748b",
-                    }}
-                  >
+                  <label htmlFor="customer-service">
                     Service <span>*</span>
                   </label>
 

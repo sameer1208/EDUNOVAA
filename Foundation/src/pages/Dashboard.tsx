@@ -4,7 +4,11 @@ import {
   CardContent,
   Chip,
   Divider,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   Typography,
 } from "@mui/material";
@@ -14,147 +18,100 @@ import {
   FiActivity,
   FiClock,
   FiDollarSign,
-  FiTrendingUp,
   FiArrowUpRight,
-  FiCalendar,
-  FiMoreHorizontal,
+  FiSearch,
+  FiChevronUp,
+  FiChevronDown,
 } from "react-icons/fi";
 
 import { LineChart, BarChart, PieChart } from "@mui/x-charts";
+import { useMemo, useState } from "react";
 
-import {
-  dashboardStats,
-  revenueData,
-  serviceData,
-  requestStatusData,
-  serviceRequests,
-} from "../data/mockdata";
-
-interface StatCardProps {
-  title: string;
-  value: string;
-  subtitle: string;
-  trend: string;
-  icon: React.ReactNode;
-  iconBackground: string;
-}
-
-const StatCard = ({
-  title,
-  value,
-  subtitle,
-  trend,
-  icon,
-  iconBackground,
-}: StatCardProps) => {
-  return (
-    <Card
-      sx={{
-        height: "100%",
-        borderRadius: 3,
-        border: "1px solid",
-        borderColor: "divider",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
-        transition: "all 0.2s ease",
-
-        "&:hover": {
-          transform: "translateY(-3px)",
-          boxShadow: "0 8px 25px rgba(0,0,0,0.08)",
-        },
-      }}
-    >
-      <CardContent sx={{ p: 2.5 }}>
-        {/* Card Header */}
-        <Stack
-          direction="row"
-          sx={{
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
-        >
-          <Box>
-            <Typography
-              variant="body2"
-              sx={{
-                color: "text.secondary",
-                fontWeight: 500,
-              }}
-            >
-              {title}
-            </Typography>
-
-            <Typography
-              sx={{
-                fontSize: {
-                  xs: 25,
-                  sm: 28,
-                },
-                fontWeight: 700,
-                mt: 1,
-                color: "#111827",
-              }}
-            >
-              {value}
-            </Typography>
-          </Box>
-
-          {/* Icon */}
-          <Box
-            sx={{
-              width: 48,
-              height: 48,
-              borderRadius: 2.5,
-              background: iconBackground,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0,
-            }}
-          >
-            {icon}
-          </Box>
-        </Stack>
-
-        {/* Trend */}
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{
-            alignItems: "center",
-            mt: 2,
-          }}
-        >
-          <Chip
-            icon={<FiTrendingUp />}
-            label={trend}
-            size="small"
-            sx={{
-              height: 24,
-              background: "#ecfdf3",
-              color: "#15803d",
-              fontWeight: 600,
-
-              "& .MuiChip-icon": {
-                color: "#15803d",
-              },
-            }}
-          />
-
-          <Typography
-            variant="caption"
-            sx={{
-              color: "text.secondary",
-            }}
-          >
-            {subtitle}
-          </Typography>
-        </Stack>
-      </CardContent>
-    </Card>
-  );
-};
+import { dashboardDataByPeriod } from "../data/mockdata";
+import { useNavigate } from "react-router-dom";
+import { StatCard } from "../components/statCard/StatCard";
 
 const Dashboard = () => {
+  type DashboardPeriod = "Today" | "This Week" | "This Month";
+
+  const [selectedPeriod, setSelectedPeriod] =
+    useState<DashboardPeriod>("This Month");
+
+  const [requestSearch, setRequestSearch] = useState("");
+  const [requestStatusFilter, setRequestStatusFilter] = useState<
+    "All" | "Active" | "Inactive" | "Pending"
+  >("All");
+  const [requestSort, setRequestSort] = useState<
+    "name" | "service" | "joinedDate"
+  >("joinedDate");
+  const [requestSortDirection, setRequestSortDirection] = useState<
+    "asc" | "desc"
+  >("desc");
+
+  const navigate = useNavigate();
+
+  const selectedDashboardData = dashboardDataByPeriod[selectedPeriod];
+  const selectedStats = selectedDashboardData.stats;
+  const periodCustomers = selectedDashboardData.customers;
+  const revenueData = selectedDashboardData.revenueData;
+  const serviceData = selectedDashboardData.serviceData;
+  const requestStatusData = selectedDashboardData.requestStatusData;
+
+  const filteredCustomers = useMemo(() => {
+    const search = requestSearch.trim().toLowerCase();
+
+    const result = periodCustomers.filter((customer) => {
+      const matchesSearch =
+        !search ||
+        customer.name.toLowerCase().includes(search) ||
+        customer.email.toLowerCase().includes(search) ||
+        customer.phone.toLowerCase().includes(search) ||
+        customer.service.toLowerCase().includes(search);
+
+      const matchesStatus =
+        requestStatusFilter === "All" ||
+        customer.status === requestStatusFilter;
+
+      return matchesSearch && matchesStatus;
+    });
+
+    return [...result].sort((a, b) => {
+      const comparison = String(a[requestSort]).localeCompare(
+        String(b[requestSort]),
+        undefined,
+        { numeric: true, sensitivity: "base" },
+      );
+      return requestSortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [
+    periodCustomers,
+    requestSearch,
+    requestStatusFilter,
+    requestSort,
+    requestSortDirection,
+  ]);
+
+  const handleRequestSort = (field: "name" | "service" | "joinedDate") => {
+    if (requestSort === field) {
+      setRequestSortDirection((current) =>
+        current === "asc" ? "desc" : "asc",
+      );
+      return;
+    }
+
+    setRequestSort(field);
+    setRequestSortDirection(field === "joinedDate" ? "desc" : "asc");
+  };
+
+  const sortIcon = (field: "name" | "service" | "joinedDate") => {
+    if (requestSort !== field) return null;
+    return requestSortDirection === "asc" ? (
+      <FiChevronUp size={13} />
+    ) : (
+      <FiChevronDown size={13} />
+    );
+  };
+
   return (
     <Box
       sx={{
@@ -218,6 +175,58 @@ const Dashboard = () => {
       </Stack>
 
       {/* =====================================================
+          DATE / PERIOD FILTER
+      ====================================================== */}
+
+      <Card
+        sx={{
+          borderRadius: 3,
+          mb: 2.5,
+          border: "1px solid",
+          borderColor: "divider",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
+        }}
+      >
+        <CardContent sx={{ p: 2 }}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            sx={{
+              justifyContent: "space-between",
+              alignItems: { xs: "stretch", sm: "center" },
+            }}
+          >
+            <Box>
+              <Typography sx={{ fontWeight: 700, fontSize: 15 }}>
+                Dashboard Filter
+              </Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                Select a date range to update the summary cards
+              </Typography>
+            </Box>
+
+            <FormControl size="small" sx={{ minWidth: 180 }}>
+              <InputLabel id="dashboard-period-filter-label">
+                Date Range
+              </InputLabel>
+              <Select
+                labelId="dashboard-period-filter-label"
+                value={selectedPeriod}
+                label="Date Range"
+                onChange={(event) =>
+                  setSelectedPeriod(event.target.value as DashboardPeriod)
+                }
+              >
+                <MenuItem value="Today">Today</MenuItem>
+                <MenuItem value="This Week">This Week</MenuItem>
+                <MenuItem value="This Month">This Month</MenuItem>
+              </Select>
+            </FormControl>
+          </Stack>
+        </CardContent>
+      </Card>
+
+      {/* =====================================================
           STATS
       ====================================================== */}
 
@@ -238,9 +247,15 @@ const Dashboard = () => {
         >
           <StatCard
             title="Total Customers"
-            value={dashboardStats.totalCustomers.toLocaleString()}
-            subtitle="vs last month"
-            trend="+12%"
+            value={selectedStats.totalCustomers.toLocaleString()}
+            subtitle={`for ${selectedPeriod.toLowerCase()}`}
+            trend={
+              selectedPeriod === "Today"
+                ? "+6%"
+                : selectedPeriod === "This Week"
+                  ? "+10%"
+                  : "+12%"
+            }
             icon={<FiUsers />}
             iconBackground="#eef2ff"
           />
@@ -256,9 +271,15 @@ const Dashboard = () => {
         >
           <StatCard
             title="Active Services"
-            value={dashboardStats.activeServices.toString()}
-            subtitle="currently active"
-            trend="+8%"
+            value={selectedStats.activeServices.toString()}
+            subtitle={`for ${selectedPeriod.toLowerCase()}`}
+            trend={
+              selectedPeriod === "Today"
+                ? "+4%"
+                : selectedPeriod === "This Week"
+                  ? "+7%"
+                  : "+8%"
+            }
             icon={<FiActivity />}
             iconBackground="#ecfeff"
           />
@@ -274,9 +295,15 @@ const Dashboard = () => {
         >
           <StatCard
             title="Pending Requests"
-            value={dashboardStats.pendingRequests.toString()}
-            subtitle="5 new today"
-            trend="+5"
+            value={selectedStats.pendingRequests.toString()}
+            subtitle={`for ${selectedPeriod.toLowerCase()}`}
+            trend={
+              selectedPeriod === "Today"
+                ? "+2"
+                : selectedPeriod === "This Week"
+                  ? "+4"
+                  : "+5"
+            }
             icon={<FiClock />}
             iconBackground="#fffbeb"
           />
@@ -292,9 +319,15 @@ const Dashboard = () => {
         >
           <StatCard
             title="Revenue"
-            value={`$${dashboardStats.revenue.toLocaleString()}`}
-            subtitle="vs last month"
-            trend="+15%"
+            value={`$${selectedStats.revenue.toLocaleString()}`}
+            subtitle={`for ${selectedPeriod.toLowerCase()}`}
+            trend={
+              selectedPeriod === "Today"
+                ? "+6%"
+                : selectedPeriod === "This Week"
+                  ? "+10%"
+                  : "+15%"
+            }
             icon={<FiDollarSign />}
             iconBackground="#ecfdf5"
           />
@@ -356,12 +389,18 @@ const Dashboard = () => {
                       color: "text.secondary",
                     }}
                   >
-                    Monthly revenue performance
+                    {selectedPeriod} revenue performance
                   </Typography>
                 </Box>
 
                 <Chip
-                  label="+15%"
+                  label={
+                    selectedPeriod === "Today"
+                      ? "+6%"
+                      : selectedPeriod === "This Week"
+                        ? "+10%"
+                        : "+15%"
+                  }
                   size="small"
                   sx={{
                     background: "#ecfdf3",
@@ -447,7 +486,7 @@ const Dashboard = () => {
                   color: "text.secondary",
                 }}
               >
-                Current request distribution
+                {selectedPeriod} request distribution
               </Typography>
 
               <Box
@@ -528,10 +567,6 @@ const Dashboard = () => {
         </Grid>
       </Grid>
 
-      {/* =====================================================
-          SERVICE PERFORMANCE
-      ====================================================== */}
-
       <Card
         sx={{
           borderRadius: 3,
@@ -557,7 +592,7 @@ const Dashboard = () => {
               color: "text.secondary",
             }}
           >
-            Requests by service
+            {selectedPeriod} requests by service
           </Typography>
 
           <Box
@@ -601,10 +636,6 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      {/* =====================================================
-          RECENT REQUESTS
-      ====================================================== */}
-
       <Card
         sx={{
           borderRadius: 3,
@@ -615,61 +646,108 @@ const Dashboard = () => {
         }}
       >
         <CardContent sx={{ p: 0 }}>
-          {/* Table Header */}
           <Stack
-            direction="row"
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
             sx={{
               justifyContent: "space-between",
-              alignItems: "center",
+              alignItems: { xs: "stretch", md: "center" },
               p: 2.5,
             }}
           >
             <Box>
-              <Typography
-                sx={{
-                  fontWeight: 700,
-                  fontSize: 16,
-                }}
-              >
+              <Typography sx={{ fontWeight: 700, fontSize: 16 }}>
                 Recent Service Requests
               </Typography>
-
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "text.secondary",
-                }}
-              >
-                Latest customer requests
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                Showing {filteredCustomers.length} of {periodCustomers.length}{" "}
+                customers
               </Typography>
             </Box>
 
-            <Chip
-              label="View All"
-              deleteIcon={<FiArrowUpRight />}
-              onDelete={() => {}}
-              variant="outlined"
-              sx={{
-                cursor: "pointer",
-              }}
-            />
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1}
+              sx={{ width: { xs: "100%", md: "auto" } }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  px: 1.25,
+                  height: 38,
+                  minWidth: { xs: "100%", sm: 210 },
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 2,
+                  background: "#fff",
+                  "&:focus-within": {
+                    borderColor: "#a5b4fc",
+                    boxShadow: "0 0 0 3px rgba(79,70,229,0.08)",
+                  },
+                }}
+              >
+                <FiSearch size={16} color="#94a3b8" />
+                <Box
+                  component="input"
+                  value={requestSearch}
+                  onChange={(event) => setRequestSearch(event.target.value)}
+                  placeholder="Search customers..."
+                  sx={{
+                    width: "100%",
+                    border: 0,
+                    outline: 0,
+                    background: "transparent",
+                    fontSize: 12,
+                    color: "#334155",
+                  }}
+                />
+              </Box>
+
+              <FormControl
+                size="small"
+                sx={{ minWidth: { xs: "100%", sm: 135 } }}
+              >
+                <Select
+                  value={requestStatusFilter}
+                  onChange={(event) =>
+                    setRequestStatusFilter(
+                      event.target.value as
+                        | "All"
+                        | "Active"
+                        | "Inactive"
+                        | "Pending",
+                    )
+                  }
+                  displayEmpty
+                  sx={{
+                    height: 38,
+                    fontSize: 12,
+                    background: "#fff",
+                    borderRadius: 2,
+                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                      borderColor: "#4f46e5",
+                    },
+                  }}
+                >
+                  <MenuItem value="All">All Status</MenuItem>
+                  <MenuItem value="Active">Active</MenuItem>
+                  <MenuItem value="Inactive">Inactive</MenuItem>
+                  <MenuItem value="Pending">Pending</MenuItem>
+                </Select>
+              </FormControl>
+            </Stack>
           </Stack>
 
           <Divider />
 
-          {/* Table */}
-          <Box
-            sx={{
-              overflowX: "auto",
-            }}
-          >
+          <Box sx={{ overflowX: "auto" }}>
             <Box
               component="table"
               sx={{
                 width: "100%",
                 minWidth: 650,
                 borderCollapse: "collapse",
-
                 "& th": {
                   textAlign: "left",
                   fontSize: 11,
@@ -680,102 +758,142 @@ const Dashboard = () => {
                   background: "#fafafa",
                   whiteSpace: "nowrap",
                 },
-
                 "& td": {
                   p: 2,
                   borderTop: "1px solid #f1f5f9",
                   fontSize: 13,
                   whiteSpace: "nowrap",
                 },
-
-                "& tbody tr:hover": {
-                  background: "#fafafa",
-                },
+                "& tbody tr:hover": { background: "#fafafa" },
               }}
             >
               <thead>
                 <tr>
-                  <th>Customer</th>
-                  <th>Service</th>
-                  <th>Date</th>
+                  {[
+                    ["name", "Customer"],
+                    ["service", "Service"],
+                    ["joinedDate", "Date"],
+                  ].map(([field, label]) => (
+                    <th key={field}>
+                      <Box
+                        component="button"
+                        type="button"
+                        onClick={() =>
+                          handleRequestSort(
+                            field as "name" | "service" | "joinedDate",
+                          )
+                        }
+                        sx={{
+                          border: 0,
+                          background: "transparent",
+                          p: 0,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                          color: "inherit",
+                          font: "inherit",
+                          textTransform: "inherit",
+                          cursor: "pointer",
+                        }}
+                      >
+                        {label}{" "}
+                        {sortIcon(field as "name" | "service" | "joinedDate")}
+                      </Box>
+                    </th>
+                  ))}
                   <th>Status</th>
                 </tr>
               </thead>
 
               <tbody>
-                {serviceRequests.map((request) => (
-                  <tr key={request.id}>
-                    {/* Customer */}
-                    <td>
-                      <Stack
-                        direction="row"
-                        spacing={1.5}
-                        sx={{
-                          alignItems: "center",
-                        }}
-                      >
-                        <Box
-                          sx={{
-                            width: 36,
-                            height: 36,
-                            borderRadius: 2,
-                            background: "#eef2ff",
-                            color: "#4f46e5",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontWeight: 700,
-                            fontSize: 12,
-                            flexShrink: 0,
-                          }}
+                {filteredCustomers.length ? (
+                  filteredCustomers.map((customer) => (
+                    <tr key={customer.id}>
+                      <td>
+                        <Stack
+                          direction="row"
+                          spacing={1.5}
+                          sx={{ alignItems: "center" }}
                         >
-                          {request.customer.charAt(0)}
-                        </Box>
-
+                          <Box
+                            sx={{
+                              width: 36,
+                              height: 36,
+                              borderRadius: 2,
+                              background:
+                                "linear-gradient(135deg,#eef2ff,#e0e7ff)",
+                              color: "#4f46e5",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontWeight: 700,
+                              fontSize: 12,
+                              flexShrink: 0,
+                            }}
+                          >
+                            {customer.name.charAt(0)}
+                          </Box>
+                          <Box>
+                            <Typography sx={{ fontSize: 13, fontWeight: 600 }}>
+                              {customer.name}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: "text.secondary", fontSize: 10 }}
+                            >
+                              {customer.email}
+                            </Typography>
+                          </Box>
+                        </Stack>
+                      </td>
+                      <td>{customer.service}</td>
+                      <td>{customer.joinedDate}</td>
+                      <td>
+                        <Chip
+                          label={customer.status}
+                          size="small"
+                          sx={{
+                            fontSize: 10,
+                            fontWeight: 600,
+                            background:
+                              customer.status === "Active"
+                                ? "#ecfdf3"
+                                : customer.status === "Pending"
+                                  ? "#fffbeb"
+                                  : "#f1f5f9",
+                            color:
+                              customer.status === "Active"
+                                ? "#15803d"
+                                : customer.status === "Pending"
+                                  ? "#b45309"
+                                  : "#64748b",
+                          }}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4}>
+                      <Box sx={{ py: 7, textAlign: "center" }}>
+                        <FiSearch size={22} color="#4f46e5" />
                         <Typography
                           sx={{
-                            fontSize: 13,
-                            fontWeight: 600,
+                            mt: 1,
+                            fontSize: 14,
+                            fontWeight: 700,
+                            color: "#334155",
                           }}
                         >
-                          {request.customer}
+                          No customers found
                         </Typography>
-                      </Stack>
-                    </td>
-
-                    {/* Service */}
-                    <td>{request.service}</td>
-
-                    {/* Date */}
-                    <td>{request.date}</td>
-
-                    {/* Status */}
-                    <td>
-                      <Chip
-                        label={request.status}
-                        size="small"
-                        sx={{
-                          fontSize: 10,
-                          fontWeight: 600,
-
-                          background:
-                            request.status === "Completed"
-                              ? "#ecfdf3"
-                              : request.status === "Pending"
-                                ? "#fffbeb"
-                                : "#eff6ff",
-
-                          color:
-                            request.status === "Completed"
-                              ? "#15803d"
-                              : request.status === "Pending"
-                                ? "#b45309"
-                                : "#1d4ed8",
-                        }}
-                      />
+                        <Typography variant="caption" sx={{ color: "#94a3b8" }}>
+                          Try changing your search or status filter.
+                        </Typography>
+                      </Box>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </Box>
           </Box>

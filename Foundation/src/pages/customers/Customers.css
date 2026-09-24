@@ -2,10 +2,6 @@
   width: 100%;
 }
 
-/* ================================
-   HEADER
-================================ */
-
 .customer-toolbar {
   display: flex;
   align-items: center;
@@ -54,10 +50,6 @@
 
   font-size: 12px;
 }
-
-/* ================================
-   BUTTONS
-================================ */
 
 .primary-btn {
   display: inline-flex;
@@ -124,10 +116,6 @@
   background: #f8fafc;
   border-color: #cbd5e1;
 }
-
-/* ================================
-   FILTERS
-================================ */
 
 .filters {
   display: flex;
@@ -248,10 +236,6 @@
   cursor: pointer;
 }
 
-/* ================================
-   RESULTS
-================================ */
-
 .customer-results {
   padding: 0 24px 14px;
 
@@ -263,10 +247,6 @@
 .customer-results strong {
   color: #475569;
 }
-
-/* ================================
-   TABLE
-================================ */
 
 .table-wrapper {
   width: 100%;
@@ -323,10 +303,6 @@
   background: #fafbff;
 }
 
-/* ================================
-   CUSTOMER CELL
-================================ */
-
 .table-customer {
   display: flex;
   align-items: center;
@@ -373,10 +349,6 @@
   font-size: 10px;
 }
 
-/* ================================
-   CONTACT
-================================ */
-
 .table-contact {
   display: flex;
   align-items: center;
@@ -389,10 +361,6 @@
 
   font-size: 14px;
 }
-
-/* ================================
-   SERVICE
-================================ */
 
 .service-badge {
   display: inline-flex;
@@ -416,10 +384,6 @@
   color: #6366f1;
   font-size: 13px;
 }
-
-/* ================================
-   STATUS
-================================ */
 
 .status {
   display: inline-flex;
@@ -469,10 +433,6 @@
   background: #f59e0b;
 }
 
-/* ================================
-   VIEW BUTTON
-================================ */
-
 .details-btn {
   display: inline-flex;
   align-items: center;
@@ -504,10 +464,6 @@
 .details-btn svg {
   font-size: 14px;
 }
-
-/* ================================
-   EMPTY STATE
-================================ */
 
 .empty-state {
   height: 300px;
@@ -573,10 +529,6 @@
   cursor: pointer;
 }
 
-/* ================================
-   MODAL
-================================ */
-
 .modal-overlay {
   position: fixed;
 
@@ -613,10 +565,6 @@
 
   animation: modalIn 0.2s ease;
 }
-
-/* ================================
-   MODAL HEADER
-================================ */
 
 .modal-header {
   display: flex;
@@ -691,10 +639,6 @@
   background: #f1f5f9;
   color: #334155;
 }
-
-/* ================================
-   FORM
-================================ */
 
 .modal-form {
   display: grid;
@@ -785,8 +729,6 @@
   color: #a1a1aa;
 }
 
-/* ERROR */
-
 .form-group.has-error .input-wrapper {
   border-color: #f87171;
 
@@ -833,10 +775,6 @@
   font-size: 9px;
 }
 
-/* ================================
-   MODAL FOOTER
-================================ */
-
 .add-customer-modal .modal-footer {
   display: flex;
   align-items: center;
@@ -850,10 +788,6 @@
 
   background: #fafbfc;
 }
-
-/* ================================
-   ANIMATIONS
-================================ */
 
 @keyframes fadeIn {
   from {
@@ -876,10 +810,6 @@
     transform: translateY(0) scale(1);
   }
 }
-
-/* ================================
-   RESPONSIVE
-================================ */
 
 @media (max-width: 700px) {
   .customer-toolbar {
@@ -952,5 +882,174 @@
   .modal-footer .secondary-btn,
   .modal-footer .primary-btn {
     flex: 1;
+  }
+}
+
+.add-customer-modal {
+  width: 100%;
+  max-width: 700px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.add-customer-modal .modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 0;
+}
+
+.add-customer-modal .form-group {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: start;
+  column-gap: 20px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.add-customer-modal .form-group:last-child {
+  border-bottom: none;
+}
+
+.add-customer-modal .form-group > label {
+  display: block;
+  margin: 0;
+  padding-top: 12px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.add-customer-modal .form-group > div {
+  min-width: 0;
+}
+
+.add-customer-modal .input-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.add-customer-modal .modal-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+}
+
+@media (max-width: 700px) {
+  .add-customer-modal {
+    max-width: 620px;
+  }
+
+  .add-customer-modal .form-group {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 14px 18px;
+  }
+
+  .add-customer-modal .form-group > label {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .modal-overlay {
+    align-items: center;
+    padding: 10px;
+  }
+
+  .add-customer-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100vh - 20px);
+    border-radius: 14px;
+  }
+
+  .add-customer-modal .modal-header {
+    padding: 16px;
+  }
+
+  .add-customer-modal .modal-title-wrapper {
+    min-width: 0;
+    gap: 9px;
+  }
+
+  .add-customer-modal .modal-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .add-customer-modal .modal-header h2 {
+    font-size: 15px;
+  }
+
+  .add-customer-modal .modal-header p {
+    max-width: 230px;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  .add-customer-modal .form-group {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 13px 16px;
+  }
+
+  .add-customer-modal .form-group > label {
+    padding-top: 0;
+    font-size: 12px;
+  }
+
+  .add-customer-modal .input-wrapper {
+    width: 100%;
+    height: 44px;
+  }
+
+  .add-customer-modal .modal-footer {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .add-customer-modal .modal-footer .secondary-btn,
+  .add-customer-modal .modal-footer .primary-btn {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .modal-overlay {
+    padding: 6px;
+  }
+
+  .add-customer-modal {
+    max-height: calc(100vh - 12px);
+    border-radius: 12px;
+  }
+
+  .add-customer-modal .modal-header {
+    padding: 14px;
+  }
+
+  .add-customer-modal .modal-header p {
+    display: none;
+  }
+
+  .add-customer-modal .form-group {
+    grid-template-columns: 1fr;
+    padding: 12px 14px;
+  }
+
+  .add-customer-modal .modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    padding: 11px 14px;
+  }
+
+  .add-customer-modal .modal-footer .secondary-btn,
+  .add-customer-modal .modal-footer .primary-btn {
+    width: 100%;
+    min-height: 40px;
   }
 }

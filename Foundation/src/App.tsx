@@ -10,10 +10,10 @@ import {
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import Customers from "./pages/Customers";
+import Customers from "./pages/customers/Customers";
 
-import Sidebar from "./components/Sidebar";
-import Header from "./components/Header";
+import Sidebar from "./components/sidebar/Sidebar";
+import Header from "./components/header/Header";
 
 import "./App.css";
 

@@ -17,8 +17,6 @@
   box-sizing: border-box;
 }
 
-/* ================= LOGO ================= */
-
 .sidebar-logo {
   display: flex;
   align-items: center;
@@ -55,7 +53,7 @@
 }
 
 .logo-title {
-  color: #111827;
+  color: #4f596e;
 
   font-size: 16px;
   font-weight: 750;
@@ -72,8 +70,6 @@
   letter-spacing: 0.2px;
 }
 
-/* ================= SECTION ================= */
-
 .sidebar-section-title {
   padding: 25px 11px 9px;
 
@@ -84,8 +80,6 @@
 
   letter-spacing: 0.08em;
 }
-
-/* ================= MENU ================= */
 
 .sidebar-menu {
   display: flex;
@@ -141,8 +135,6 @@
   background: #e9edff;
 }
 
-/* ================= ICON ================= */
-
 .sidebar-icon {
   width: 20px;
   height: 20px;
@@ -160,8 +152,6 @@
   flex: 1;
 }
 
-/* ================= ACTIVE ARROW ================= */
-
 .sidebar-arrow {
   width: 20px;
   height: 20px;
@@ -175,8 +165,6 @@
   opacity: 0.8;
 }
 
-/* ================= BOTTOM ================= */
-
 .sidebar-bottom {
   margin-top: auto;
 
@@ -187,8 +175,6 @@
   background: #fef2f2;
   color: #dc2626;
 }
-
-/* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
   .sidebar {

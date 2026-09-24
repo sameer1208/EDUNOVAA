@@ -4,6 +4,7 @@ import {
   FiSettings,
   FiLogOut,
   FiChevronRight,
+  FiLayers,
 } from "react-icons/fi";
 import "./Sidebar.css";
 
@@ -34,7 +35,7 @@ const Sidebar = ({ activePage, setActivePage }: SidebarProps) => {
       {/* ================= LOGO ================= */}
       <div className="sidebar-logo">
         <div className="logo-icon">
-          <span>S</span>
+          <FiLayers size={21} strokeWidth={2.5} />
         </div>
 
         <div className="logo-content">
