@@ -79,11 +79,8 @@ const Customers = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   const nameRef = useRef<HTMLInputElement>(null);
-
   const emailRef = useRef<HTMLInputElement>(null);
-
   const phoneRef = useRef<HTMLInputElement>(null);
-
   const serviceRef = useRef<HTMLInputElement>(null);
 
   const filteredCustomers = useMemo(() => {
@@ -124,7 +121,6 @@ const Customers = () => {
     }
 
     setSortField(field);
-
     setSortDirection(field === "joinedDate" ? "desc" : "asc");
   };
 
@@ -149,6 +145,10 @@ const Customers = () => {
           return "Name must contain at least 2 characters";
         }
 
+        if (trimmedValue.length > 50) {
+          return "Name must not exceed 50 characters";
+        }
+
         if (!/^[a-zA-Z\s.'-]+$/.test(trimmedValue)) {
           return "Please enter a valid name";
         }
@@ -158,6 +158,10 @@ const Customers = () => {
       case "email":
         if (!trimmedValue) {
           return "Email address is required";
+        }
+
+        if (trimmedValue.length > 254) {
+          return "Email must not exceed 254 characters";
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmedValue)) {
@@ -284,6 +288,14 @@ const Customers = () => {
       updatedValue = value.replace(/\D/g, "").slice(0, 10);
     }
 
+    if (field === "name") {
+      updatedValue = value.slice(0, 50);
+    }
+
+    if (field === "email") {
+      updatedValue = value.slice(0, 254);
+    }
+
     setNewCustomer((previous) => ({
       ...previous,
       [field]: updatedValue,
@@ -375,7 +387,6 @@ const Customers = () => {
 
             <div>
               <h2>Customers</h2>
-
               <p>Manage and view all your customers</p>
             </div>
           </div>
@@ -488,6 +499,7 @@ const Customers = () => {
                       }}
                     >
                       {label}
+
                       {sortIcon(field as CustomerSortField)}
                     </button>
                   </th>
@@ -656,7 +668,6 @@ const Customers = () => {
 
                 <div>
                   <h2>Add Customer</h2>
-
                   <p>Add a new customer to your database</p>
                 </div>
               </div>
@@ -692,12 +703,15 @@ const Customers = () => {
                         type="text"
                         placeholder="Enter customer name"
                         value={newCustomer.name}
+                        maxLength={50}
                         onChange={(event) =>
                           handleNewCustomerChange("name", event.target.value)
                         }
                         aria-invalid={!!errors.name}
                       />
                     </div>
+
+                    <div className="input-hint">Maximum 50 characters</div>
 
                     {errors.name && (
                       <div className="field-error">
@@ -727,12 +741,15 @@ const Customers = () => {
                         type="email"
                         placeholder="Enter email address"
                         value={newCustomer.email}
+                        maxLength={254}
                         onChange={(event) =>
                           handleNewCustomerChange("email", event.target.value)
                         }
                         aria-invalid={!!errors.email}
                       />
                     </div>
+
+                    <div className="input-hint">Maximum 254 characters</div>
 
                     {errors.email && (
                       <div className="field-error">
@@ -763,10 +780,10 @@ const Customers = () => {
                         inputMode="numeric"
                         placeholder="Enter 10-digit phone number"
                         value={newCustomer.phone}
+                        maxLength={10}
                         onChange={(event) =>
                           handleNewCustomerChange("phone", event.target.value)
                         }
-                        maxLength={10}
                         aria-invalid={!!errors.phone}
                       />
                     </div>
