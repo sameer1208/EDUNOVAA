@@ -7,6 +7,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -50,12 +51,13 @@ const ProtectedLayout = () => {
         break;
 
       case "Settings":
-        // Settings page abhi available nahi hai
+        
         break;
 
       case "Logout":
         localStorage.removeItem("isLoggedIn");
         setIsLoggedIn(false);
+
         navigate("/login", {
           replace: true,
         });
@@ -88,9 +90,17 @@ const ProtectedLayout = () => {
 const App = () => {
   return (
     <BrowserRouter>
+      {/* Global Toast Container */}
+      <Toaster
+        position="bottom-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+        }}
+      />
+
       <Routes>
         {/* ================= LOGIN ================= */}
-
         <Route
           path="/login"
           element={
@@ -105,7 +115,6 @@ const App = () => {
         />
 
         {/* ================ PROTECTED APP ================ */}
-
         <Route path="/*" element={<ProtectedLayout />} />
       </Routes>
     </BrowserRouter>

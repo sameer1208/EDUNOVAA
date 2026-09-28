@@ -576,25 +576,6 @@ td {
 }
 
 @media (max-width: 800px) {
-  .sidebar {
-    width: 70px;
-    padding: 20px 10px;
-  }
-
-  .sidebar-logo span,
-  .sidebar-item span:last-child {
-    display: none;
-  }
-
-  .sidebar-logo {
-    justify-content: center;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .sidebar-item {
-    justify-content: center;
-  }
 
   .main-content {
     margin-left: 70px;

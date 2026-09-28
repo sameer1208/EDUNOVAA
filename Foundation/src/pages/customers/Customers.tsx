@@ -22,6 +22,8 @@ import {
   FiUsers,
 } from "react-icons/fi";
 
+import toast from "react-hot-toast";
+
 import CustomerModal from "../../components/customer/CustomerModal";
 
 import {
@@ -56,6 +58,7 @@ const Customers = () => {
     | "status";
 
   const [sortField, setSortField] = useState<CustomerSortField>("joinedDate");
+
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
@@ -76,8 +79,11 @@ const Customers = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   const nameRef = useRef<HTMLInputElement>(null);
+
   const emailRef = useRef<HTMLInputElement>(null);
+
   const phoneRef = useRef<HTMLInputElement>(null);
+
   const serviceRef = useRef<HTMLInputElement>(null);
 
   const filteredCustomers = useMemo(() => {
@@ -118,6 +124,7 @@ const Customers = () => {
     }
 
     setSortField(field);
+
     setSortDirection(field === "joinedDate" ? "desc" : "asc");
   };
 
@@ -155,6 +162,15 @@ const Customers = () => {
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmedValue)) {
           return "Please enter a valid email address";
+        }
+
+        const emailExists = customers.some(
+          (customer) =>
+            customer.email.toLowerCase().trim() === trimmedValue.toLowerCase(),
+        );
+
+        if (emailExists) {
+          return "Customer with this email already exists";
         }
 
         return "";
@@ -245,7 +261,7 @@ const Customers = () => {
     const customer: Customer = {
       id: Date.now(),
       name: newCustomer.name.trim(),
-      email: newCustomer.email.trim(),
+      email: newCustomer.email.trim().toLowerCase(),
       phone: newCustomer.phone.trim(),
       service: newCustomer.service.trim(),
       status: "Active",
@@ -253,6 +269,8 @@ const Customers = () => {
     };
 
     setCustomers((previous) => [customer, ...previous]);
+
+    toast.success("Customer added successfully!");
 
     resetCustomerForm();
 
@@ -348,6 +366,7 @@ const Customers = () => {
 
       <div className="section-card">
         {/* HEADER */}
+
         <div className="customer-toolbar">
           <div className="page-heading">
             <div className="page-heading-icon">
@@ -377,6 +396,7 @@ const Customers = () => {
 
         <div className="filters">
           {/* SEARCH */}
+
           <div className="search-box">
             <FiSearch />
 
@@ -402,6 +422,7 @@ const Customers = () => {
           </div>
 
           {/* STATUS FILTER */}
+
           <div className="filter-select-wrapper">
             <FiFilter />
 
@@ -436,6 +457,7 @@ const Customers = () => {
         {/* ====================================
             TABLE
         ===================================== */}
+
         <div className="table-wrapper">
           <table className="customers-table">
             <thead>
@@ -470,6 +492,7 @@ const Customers = () => {
                     </button>
                   </th>
                 ))}
+
                 <th>Action</th>
               </tr>
             </thead>
@@ -479,6 +502,7 @@ const Customers = () => {
                 filteredCustomers.map((customer) => (
                   <tr key={customer.id}>
                     {/* NAME */}
+
                     <td>
                       <div
                         style={{
@@ -505,6 +529,7 @@ const Customers = () => {
                     </td>
 
                     {/* EMAIL */}
+
                     <td>
                       <div className="table-contact">
                         <FiMail />
@@ -513,6 +538,7 @@ const Customers = () => {
                     </td>
 
                     {/* PHONE */}
+
                     <td>
                       <div className="table-contact">
                         <FiPhone />
@@ -521,6 +547,7 @@ const Customers = () => {
                     </td>
 
                     {/* SERVICE */}
+
                     <td>
                       <div className="table-contact">
                         <FiBriefcase />
@@ -529,6 +556,7 @@ const Customers = () => {
                     </td>
 
                     {/* JOINED DATE */}
+
                     <td>
                       <span
                         style={{
@@ -542,6 +570,7 @@ const Customers = () => {
                     </td>
 
                     {/* STATUS */}
+
                     <td>
                       <span
                         className={`status ${customer.status.toLowerCase()}`}
@@ -552,6 +581,7 @@ const Customers = () => {
                     </td>
 
                     {/* ACTION */}
+
                     <td>
                       <button
                         type="button"
@@ -617,6 +647,7 @@ const Customers = () => {
             onClick={(event) => event.stopPropagation()}
           >
             {/* MODAL HEADER */}
+
             <div className="modal-header">
               <div className="modal-title-wrapper">
                 <div className="modal-icon">
@@ -625,6 +656,7 @@ const Customers = () => {
 
                 <div>
                   <h2>Add Customer</h2>
+
                   <p>Add a new customer to your database</p>
                 </div>
               </div>
@@ -640,9 +672,11 @@ const Customers = () => {
             </div>
 
             {/* FORM */}
+
             <form onSubmit={handleAddCustomer} noValidate>
               <div className="modal-form">
                 {/* NAME */}
+
                 <div className={`form-group ${errors.name ? "has-error" : ""}`}>
                   <label htmlFor="customer-name">
                     Customer Name <span>*</span>
@@ -675,6 +709,7 @@ const Customers = () => {
                 </div>
 
                 {/* EMAIL */}
+
                 <div
                   className={`form-group ${errors.email ? "has-error" : ""}`}
                 >
@@ -709,6 +744,7 @@ const Customers = () => {
                 </div>
 
                 {/* PHONE */}
+
                 <div
                   className={`form-group ${errors.phone ? "has-error" : ""}`}
                 >
@@ -747,6 +783,7 @@ const Customers = () => {
                 </div>
 
                 {/* SERVICE */}
+
                 <div
                   className={`form-group ${errors.service ? "has-error" : ""}`}
                 >
@@ -782,6 +819,7 @@ const Customers = () => {
               </div>
 
               {/* FOOTER */}
+
               <div className="modal-footer">
                 <button
                   type="button"
